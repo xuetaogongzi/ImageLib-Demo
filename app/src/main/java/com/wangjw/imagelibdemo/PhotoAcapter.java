@@ -1,16 +1,15 @@
 package com.wangjw.imagelibdemo;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View itemView = inflater.inflate(R.layout.grit_item_photo, null);
+        View itemView = inflater.inflate(R.layout.grid_item_photo, null);
         PhotoViewHolder holder = new PhotoViewHolder(itemView);
 
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
@@ -55,19 +54,18 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
         float density = dm.density; // 屏幕密度（0.75 / 1.0 / 1.5）
 
         int w = (int) ((width - density * 32 - density * 16) / 3);
-        ViewGroup.LayoutParams params = holder.mImgPhoto.getLayoutParams();
+        ViewGroup.LayoutParams params = holder.mDraweeView.getLayoutParams();
         params.width = w;
         params.height = w;
-        holder.mImgPhoto.setLayoutParams(params);
+        holder.mDraweeView.setLayoutParams(params);
 
         return holder;
     }
 
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
-        Bitmap bitmap = BitmapFactory.decodeFile(mImgFileList.get(position));
-        Log.d("MainActivity", "width = " + bitmap.getWidth() + ", height = " + bitmap.getHeight());
-        holder.mImgPhoto.setImageBitmap(bitmap);
+        Uri uri = Uri.parse("file://" + mImgFileList.get(position));
+        holder.mDraweeView.setImageURI(uri);
     }
 
     public List<String> getImgFileList() {
@@ -76,12 +74,12 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
 
     class PhotoViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView mImgPhoto;
+        private SimpleDraweeView mDraweeView;
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
 
-            mImgPhoto = (ImageView) itemView.findViewById(R.id.ImageView_Photo);
+            mDraweeView = (SimpleDraweeView) itemView.findViewById(R.id.SimpleDraweeView);
         }
 
     }
