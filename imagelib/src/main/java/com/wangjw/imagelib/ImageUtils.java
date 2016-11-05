@@ -93,7 +93,7 @@ public class ImageUtils {
 
                 try {
                     Bitmap rotateBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
-                    if(bmp != rotateBmp) {
+                    if (bmp != rotateBmp) {
                         bmp.recycle();
                         bmp = null;
                     }
@@ -120,10 +120,8 @@ public class ImageUtils {
      *
      * @return inSampleSize
      */
-    public static int computeSampleSize(BitmapFactory.Options options,
-                                        int minSideLength, int maxNumOfPixels) {
-        int initialSize = computeInitialSampleSize(options, minSideLength,
-                maxNumOfPixels);
+    public static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+        int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);
 
         int roundedSize;
         if (initialSize <= 8 ) {

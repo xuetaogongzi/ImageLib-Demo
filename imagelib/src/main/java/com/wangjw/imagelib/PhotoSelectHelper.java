@@ -138,10 +138,7 @@ public class PhotoSelectHelper {
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQ_CODE_TAKE_PHOTO) { //拍照获取图片
             if (resultCode != Activity.RESULT_OK) {
-                deleteCacheFile();
-                if (mOnPhotoSelectListener != null) {
-                    mOnPhotoSelectListener.onPhotoSelectFail(ErrorType.ERROR_USER_CANCELLED, null);
-                }
+                handleUserCancel();
                 return true;
             }
 
@@ -152,34 +149,16 @@ public class PhotoSelectHelper {
             }
 
             if (mIsReturnOriginalImage) {
-                if (mOnPhotoSelectListener != null) {
-                    mOnPhotoSelectListener.onPhotoSelectSucc(data, mCacheFile);
-                }
+                returnOriginalImage(data, mCacheFile);
                 return true;
             }
 
-            DisplayMetrics dm = mActivity.getResources().getDisplayMetrics();
-            int w = dm.widthPixels;
-            int h = dm.heightPixels;
-            //限制输出图片大小
-            Bitmap bmp = ImageUtils.decodeFileAndConsiderExif(mCacheFile.getAbsolutePath(), Math.min(w, h), w * h);
-            if (bmp != null) {
-                //图片保存在文件里
-                ImageUtils.saveImage2File(bmp, 100, mCacheFile);
-                bmp.recycle();
-            }
-
-            if (mOnPhotoSelectListener != null) {
-                mOnPhotoSelectListener.onPhotoSelectSucc(data, mCacheFile);
-            }
+            returnCompressImage(data, mCacheFile.getAbsolutePath());
             return true;
 
         } else if (requestCode == REQ_CODE_SELECT_PHOTO) { //相册选择图片
             if (resultCode != Activity.RESULT_OK) {
-                deleteCacheFile();
-                if (mOnPhotoSelectListener != null) {
-                    mOnPhotoSelectListener.onPhotoSelectFail(ErrorType.ERROR_USER_CANCELLED, null);
-                }
+                handleUserCancel();
                 return true;
             }
 
@@ -198,25 +177,11 @@ public class PhotoSelectHelper {
 
                         if (mIsReturnOriginalImage) {
                             deleteCacheFile();
-                            if(mOnPhotoSelectListener != null) {
-                                mOnPhotoSelectListener.onPhotoSelectSucc(data, new File(path));
-                            }
+                            returnOriginalImage(data, new File(path));
                             return true;
                         }
 
-                        DisplayMetrics dm = mActivity.getResources().getDisplayMetrics();
-                        //限制输出图片大小
-                        int w = dm.widthPixels;
-                        int h = dm.heightPixels;
-                        Bitmap bmp = ImageUtils.decodeFileAndConsiderExif(path, Math.min(w, h), w * h);
-                        if (bmp != null) {
-                            //图片保存在文件里
-                            ImageUtils.saveImage2File(bmp, 100, mCacheFile);
-                            bmp.recycle();
-                        }
-                        if (mOnPhotoSelectListener != null) {
-                            mOnPhotoSelectListener.onPhotoSelectSucc(data, mCacheFile);
-                        }
+                        returnCompressImage(data, path);
                         return true;
                     } else {
                         deleteCacheFile();
@@ -239,10 +204,7 @@ public class PhotoSelectHelper {
             return true;
         } else if (requestCode == REQ_CODE_CROP_IMAGE) {
             if (resultCode != Activity.RESULT_OK) {
-                deleteCacheFile();
-                if (mOnPhotoSelectListener != null) {
-                    mOnPhotoSelectListener.onPhotoSelectFail(ErrorType.ERROR_USER_CANCELLED, null);
-                }
+                handleUserCancel();
                 return true;
             }
 
@@ -251,6 +213,47 @@ public class PhotoSelectHelper {
             }
         }
         return false;
+    }
+
+    private void handleUserCancel() {
+        deleteCacheFile();
+        if (mOnPhotoSelectListener != null) {
+            mOnPhotoSelectListener.onPhotoSelectFail(ErrorType.ERROR_USER_CANCELLED, null);
+        }
+    }
+
+    /**
+     * 返回原图
+     * @param data Intent
+     * @param originalFile 原图
+     */
+    private void returnOriginalImage(Intent data, File originalFile) {
+        if (mOnPhotoSelectListener != null) {
+            mOnPhotoSelectListener.onPhotoSelectSucc(data, originalFile);
+        }
+    }
+
+    /**
+     * 返回压缩图
+     * @param data Intent
+     * @param filePath 原图路径
+     */
+    private void returnCompressImage(Intent data, String filePath) {
+        DisplayMetrics dm = mActivity.getResources().getDisplayMetrics();
+        int w = dm.widthPixels;
+        int h = dm.heightPixels;
+
+        //限制输出图片大小
+        Bitmap bmp = ImageUtils.decodeFileAndConsiderExif(filePath, Math.min(w, h), w * h);
+        if (bmp != null) {
+            //图片保存在文件里
+            ImageUtils.saveImage2File(bmp, 100, mCacheFile);
+            bmp.recycle();
+        }
+
+        if (mOnPhotoSelectListener != null) {
+            mOnPhotoSelectListener.onPhotoSelectSucc(data, mCacheFile);
+        }
     }
 
     /**
