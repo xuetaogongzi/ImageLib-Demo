@@ -1,6 +1,7 @@
 package com.wangjw.imagelibdemo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -19,7 +20,7 @@ import java.util.List;
  * Created by wangjw on 16/11/5.
  */
 
-public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHolder> {
+public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHolder> implements View.OnClickListener {
 
     private Context mContext;
     private List<String> mImgFileList = new ArrayList<String>();
@@ -38,6 +39,22 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
         notifyDataSetChanged();
     }
 
+    public List<String> getImgFileList() {
+        return mImgFileList;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Integer index = (Integer) v.getTag();
+        PhotoPagerInfo pagerInfo = new PhotoPagerInfo();
+        pagerInfo.setPhotoList(mImgFileList);
+
+        Intent intent = new Intent(mContext, PhotoPagerActivity.class);
+        intent.putExtra(PhotoPagerActivity.EXTRA_KEY_PAGER_INFO, pagerInfo);
+        intent.putExtra(PhotoPagerActivity.EXTRA_KEY_INDEX, index);
+        mContext.startActivity(intent);
+    }
+
     @Override
     public int getItemCount() {
         return mImgFileList.size();
@@ -48,6 +65,7 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View itemView = inflater.inflate(R.layout.grid_item_photo, null);
         PhotoViewHolder holder = new PhotoViewHolder(itemView);
+        holder.mDraweeView.setOnClickListener(this);
 
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
         int width = dm.widthPixels; // 屏幕宽度（像素）
@@ -66,10 +84,8 @@ public class PhotoAcapter extends RecyclerView.Adapter<PhotoAcapter.PhotoViewHol
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
         Uri uri = Uri.parse("file://" + mImgFileList.get(position));
         holder.mDraweeView.setImageURI(uri);
-    }
 
-    public List<String> getImgFileList() {
-        return mImgFileList;
+        holder.mDraweeView.setTag(position);
     }
 
     class PhotoViewHolder extends RecyclerView.ViewHolder {

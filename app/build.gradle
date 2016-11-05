@@ -31,4 +31,5 @@ dependencies {
     compile project(':imagelib')
 
     compile 'com.facebook.fresco:fresco:0.14.1'
+    compile 'com.github.chrisbanes.photoview:library:1.2.3'
 }
