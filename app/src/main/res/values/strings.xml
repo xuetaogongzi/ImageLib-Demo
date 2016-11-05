@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">王小牧</string>
+
+    <string-array name="add_img_choice">
+        <item>拍照</item>
+        <item>从相册选取</item>
+    </string-array>
+</resources>
