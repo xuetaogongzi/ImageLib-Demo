@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PhotoSelectHelper.OnPhotoSelectListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, PhotoSelectHelper.OnPhotoSelectListener {
 
     private static final String TAG = "MainActivity";
 
@@ -53,23 +53,25 @@ public class MainActivity extends AppCompatActivity implements PhotoSelectHelper
         mPhotoHandler = new PhotoSelectHelper(this, StorageUtils.getOwnCacheDirectory(this, AppConfig.IMAGE_CACHE_PATH));
         mPhotoHandler.setOnPhotoSelectListener(this);
 
-        mBtnAddPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setItems(R.array.add_img_choice, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            checkCamera();
-                        } else if (which == 1) {
-                            mPhotoHandler.selectPhotoFromGallery();
-                        }
+        mBtnAddPhoto.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.Button_Add_Photo) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setItems(R.array.add_img_choice, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        checkCamera();
+                    } else if (which == 1) {
+                        mPhotoHandler.selectPhotoFromGallery();
                     }
-                });
-                builder.create().show();
-            }
-        });
+                }
+            });
+            builder.create().show();
+        }
     }
 
     @Override
